@@ -1,0 +1,32 @@
+{
+  "name": "honeypot-detector-backend",
+  "version": "1.0.0",
+  "description": "Smart Contract Honeypot Detection Backend",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "blockchain",
+    "security",
+    "solidity",
+    "honeypot",
+    "smart-contracts",
+    "web3"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "ethers": "^6.16.0",
+    "express": "^5.2.1",
+    "solidity-parser-antlr": "^0.4.11"
+  },
+  "devDependencies": {
+    "hardhat": "^3.4.5",
+    "nodemon": "^3.1.14"
+  }
+}
