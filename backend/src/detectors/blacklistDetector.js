@@ -1,61 +1,32 @@
-import { traverseAST }
-from "../utils/astHelpers.js";
+import parser from 'solidity-parser-antlr';
+import { createFinding } from '../utils/findings.js';
 
-const suspiciousKeywords = [
-    "blacklist",
-    "blocked",
-    "ban",
-    "deny",
-    "bot"
-];
-
-export function detectBlacklist(ast) {
-
+/**
+ * Detects mappings used for blacklisting addresses.
+ * Verified to work with solidity-parser-antlr AST structure.
+ */
+export const detectBlacklist = (ast) => {
     const findings = [];
 
-    traverseAST(ast, (node) => {
-
-        if (
-            node.type === "StateVariableDeclaration"
-        ) {
-
-            for (const variable of node.variables || []) {
-
-                const variableName =
-                    variable.name?.toLowerCase();
-
-                if (!variableName) continue;
-
-                for (const keyword of suspiciousKeywords) {
-
-                    if (
-                        variableName.includes(keyword)
-                    ) {
-
-                        findings.push({
-
-                            type: "Blacklist",
-
-                            severity: "HIGH",
-
-                            message:
-                                `Suspicious blacklist variable detected: ${variable.name}`,
-
-                            line:
-                                node.loc?.start?.line
-
-                        });
-
-                    }
-
+    parser.visit(ast, {
+        VariableDeclaration(node) {
+            // 1. Check if the variable type is a Mapping
+            if (node.typeName && node.typeName.type === 'Mapping') {
+                
+                // 2. Check the variable name for suspicious keywords
+                const name = node.name ? node.name.toLowerCase() : "";
+                
+                if (name.includes('black') || name.includes('block') || name.includes('limit')) {
+                    findings.push(createFinding(
+                        'BLACKLIST_LOGIC',
+                        `Suspicious mapping detected: "${node.name}". This is a common pattern in honeypots to prevent specific addresses from selling.`,
+                        'HIGH',
+                        0.9 // Confidence level
+                    ));
                 }
-
             }
-
         }
-
     });
 
     return findings;
-
-}
+};

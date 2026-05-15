@@ -27,3 +27,25 @@ export function traverseAST(ast, callback) {
     });
 
 }
+
+export function isFunctionCall(node, name) {
+  return (
+    node.type === "FunctionCall" &&
+    node.expression?.name === name
+  );
+}
+export function isRequireStatement(node) {
+  return (
+    node.type === "FunctionCall" &&
+    node.expression?.name === "require"
+  );
+}
+export function hasModifier(node, modifierName) {
+  return node.modifiers?.some(m => m.name === modifierName);
+}
+export function isStateWrite(node) {
+  return (
+    node.type === "Assignment" ||
+    (node.type === "UnaryOperation" && node.operator === "++")
+  );
+}

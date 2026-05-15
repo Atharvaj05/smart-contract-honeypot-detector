@@ -1,22 +1,12 @@
-import parser from "solidity-parser-antlr";
+import parser from 'solidity-parser-antlr';
 
-export function parseSolidity(code) {
-
+export function parseAST(sourceCode) {
     try {
-
-        const ast = parser.parse(code, {
-            loc: true,
-            range: true
-        });
-
+        // We parse with 'loc' enabled to potentially show line numbers in the UI
+        const ast = parser.parse(sourceCode, { loc: true, range: true });
         return ast;
-
-    } catch (err) {
-
-        throw new Error(
-            `Solidity parsing failed: ${err.message}`
-        );
-
+    } catch (e) {
+        console.error("AST Parsing Error:", e);
+        throw new Error("Syntax error in Solidity code. Please check your contract.");
     }
-
 }

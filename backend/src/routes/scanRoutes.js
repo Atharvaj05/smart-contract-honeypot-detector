@@ -1,15 +1,13 @@
 import express from "express";
 
-import {
-    scanContract
-}
+import { scanContract }
 from "../controllers/scanController.js";
 
 const router = express.Router();
 
 router.post(
-    "/scan",
-    scanContract
+  "/scan",
+  scanContract
 );
 
 export default router;
