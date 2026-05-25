@@ -70,7 +70,7 @@ Sentinel is organized as a high-performance **Monorepo** decoupled into distinct
          │                                       (Score & Risk Metric Calculation)
          ▼
 [Vercel Frontend Client] ──(Defensive Parser)──> [UI Render Panel]
-
+```
 🚨 Vulnerability Vectors Audited
 Sentinel explicitly analyzes contract syntax to capture the following high-risk honeypot blueprints:
 
