@@ -25,7 +25,8 @@ function App() {
         ? { address: inputValue }
         : { sourceCode: inputValue };
         
-      const response = await axios.post('http://localhost:5000/api/scan', payload);
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await axios.post(`${API_BASE_URL}/api/scan`, payload);
       
       // Ensure we received valid data before setting results
       if (response.data && response.data.success) {
