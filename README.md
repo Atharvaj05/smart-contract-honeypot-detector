@@ -70,3 +70,66 @@ Sentinel is organized as a high-performance **Monorepo** decoupled into distinct
          │                                       (Score & Risk Metric Calculation)
          ▼
 [Vercel Frontend Client] ──(Defensive Parser)──> [UI Render Panel]
+
+🚨 Vulnerability Vectors Audited
+Sentinel explicitly analyzes contract syntax to capture the following high-risk honeypot blueprints:
+
+Blacklist Logic (BLACKLIST_LOGIC): Catches hidden mappings (e.g., _isBlacklisted, isFrozen) used by owners to unilaterally strip specific user wallets of transaction execution rights.
+
+Excessive Owner Privileges (OWNER_PRIVILEGE): Pinpoints absolute operational capabilities over structural states, including unrestrictive access to RenounceOwnership or parameters modifying external fee limits.
+
+Hidden Minting & Supply Dilution (HIDDEN_MINT): Evaluates whether the system state allows internal _mint loops to change totalSupply after constructor finalization.
+
+Dynamic Fee Trapping (SUSPICIOUS_VARIABLE): Traps arbitrary fee/tax configurations (e.g., burnTaxRate, sellFee) that can be altered programmatically to 100%, rendering assets unsellable.
+
+⚙️ Local Development & Setup
+Follow these steps to configure and run the entire full-stack application on your local workstation.
+
+Prerequisites
+Ensure Node.js (v16.x or higher) and npm are installed.
+
+1. Clone the Repository
+Bash
+git clone [https://github.com/YOUR_USERNAME/Honeypot-detector.git](https://github.com/YOUR_USERNAME/Honeypot-detector.git)
+cd Honeypot-detector
+2. Configure the Backend Node API
+Navigate to the backend directory, fetch project dependencies, and initialize the server:
+
+Bash
+cd backend
+npm install
+Create a .env file within the root of the /backend folder to manage optional variables:
+
+Code snippet
+PORT=5000
+NODE_ENV=development
+# ETHERSCAN_API_KEY=your_key_here (optional for address lookup)
+Launch the backend:
+
+Bash
+node server.js
+The server will instantiate and output: Backend Server running on port 5000.
+
+3. Configure the Frontend React Application
+Open a new terminal session, navigate to the frontend directory, install dependencies, and launch Vite:
+
+Bash
+cd ../frontend
+npm install
+Launch the development server:
+
+Bash
+npm run dev
+Open your browser and navigate to the output address (typically http://localhost:5173).
+
+📈 Future Roadmaps & Enhancements
+Abstract Syntax Tree (AST) Visualizer: Integrating full compilation graphing to display function reference trees directly in the browser interface.
+
+Simulated Sandbox EVM Execution: Running dry-run contract transaction calls via an isolated virtual runtime environment to map post-buy transfer behaviors dynamically.
+
+Multi-Chain Explorer Integration: Expanding scanning layers to seamlessly fetch sources across Polygon, Arbitrum, Optimism, and Avalanche explorers.
+
+⚖️ License & Disclaimer
+This project was developed for educational and academic assessment purposes. While Sentinel uses comprehensive rule profiles to identify malicious behaviors, it does not substitute for a formal, multi-signature contract verification audit. Always exercise caution when interacting with experimental crypto-assets.
+
+Distributed under the MIT License. See LICENSE for more details.
