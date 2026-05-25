@@ -1,29 +1,41 @@
 import { createFinding } from "../utils/findings.js";
+import parser from "@solidity-parser/parser";
 
 export function detectHighTax(ast) {
   const findings = [];
+  const suspiciousKeywords = /fee|tax|commission|basisPoints|limit|maxTransfer/gi;
 
-  function visit(node) {
-    if (!node) return;
+  parser.visit(ast, {
+    // Detect hardcoded limits in transfers (e.g., amount < 1 ether)
+    BinaryOperation(node) {
+      if (node.operator === "<" || node.operator === "<=") {
+        const left = JSON.stringify(node.left);
+        const right = JSON.stringify(node.right);
+        
+        if (left.includes("amount") || right.includes("ether")) {
+          findings.push(createFinding({
+            type: "TRANSFER_LIMIT",
+            severity: "HIGH",
+            message: "Hardcoded transfer limit detected. This is a common honeypot technique to prevent large sells.",
+            location: node.loc
+          }));
+        }
+      }
+    },
 
-    const text = JSON.stringify(node);
-
-    const taxMatch = text.match(/fee|tax|commission/gi);
-
-    if (taxMatch && text.includes("uint")) {
-      findings.push(
-        createFinding({
-          type: "HIGH_TAX",
-          severity: "MEDIUM",
-          message: "Potential dynamic tax/fee system detected",
-          location: node.src
-        })
-      );
+    StateVariableDeclaration(node) {
+      node.variables.forEach((variable) => {
+        if (suspiciousKeywords.test(variable.name)) {
+          findings.push(createFinding({
+            type: "SUSPICIOUS_VARIABLE",
+            severity: "MEDIUM",
+            message: `Variable "${variable.name}" detected. May be used to manipulate taxes or limits.`,
+            location: node.loc
+          }));
+        }
+      });
     }
+  });
 
-    for (let k in node) visit(node[k]);
-  }
-
-  visit(ast);
   return findings;
 }

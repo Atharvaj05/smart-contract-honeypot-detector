@@ -1,27 +1,49 @@
 process.removeAllListeners('warning');
-import { runFullScan } from "./services/scannerEngine.js";
-import path from 'path';
+import { parseAST } from "./services/astParser.js";
+import { analyzeContract } from "./services/analyzer.js";
 
-async function test() {
-    console.log("🚀 Starting Security Engine Test...");
+const sampleHoneypot = `
+pragma solidity ^0.8.0;
+contract Honeypot {
+    mapping (address => bool) public blacklisted;
+    address public owner;
+
+    constructor() { owner = msg.sender; }
+
+    function transfer(address to, uint256 amount) public {
+        require(!blacklisted[msg.sender], "You are blacklisted");
+        if(msg.sender != owner) {
+            require(amount < 1 ether, "Transfer limit exceeded");
+        }
+    }
+
+    function setBlacklist(address _user) public {
+        require(msg.sender == owner);
+        blacklisted[_user] = true;
+    }
+}
+`;
+
+function runTest() {
+    console.log("--- Starting Backend Logic Test ---");
     try {
-        // Path to your test contract (ensure this file exists!)
-        const contractPath = path.resolve('contracts/testContract.sol');
-        const report = await runFullScan(contractPath);
+        console.log("1. Testing Parser...");
+        const ast = parseAST(sampleHoneypot);
+        console.log("✅ Parser Success");
 
-        console.log("\n===== FINAL SCAN RESULT =====");
-        console.log(`Security Score: ${report.securityScore}/100`);
-        console.log(`Risk Level: ${report.riskLevel}`);
-        console.log(`Total Findings: ${report.summary.totalIssues}`);
+        console.log("2. Testing Analyzers...");
+        const results = analyzeContract(ast);
+        console.log("✅ Analysis Success");
         
-        console.log("\nDetailed Findings:");
-        report.findings.forEach((f, i) => {
-            console.log(`[${i+1}] ${f.severity} - ${f.type}: ${f.message}`);
-        });
-
-    } catch (err) {
-        console.error("❌ Test Failed:", err.message);
+        console.log("--- Findings ---");
+        console.log(JSON.stringify(results, null, 2));
+    } catch (error) {
+        console.error("❌ Test Failed!");
+        console.error("Error Message:", error.message);
+        if (error.stack) {
+            console.error("Stack Trace:", error.stack);
+        }
     }
 }
 
-test();
+runTest();
