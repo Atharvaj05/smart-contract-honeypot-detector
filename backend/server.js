@@ -9,7 +9,11 @@ const app = express();
 
 // Explicitly define CORS to allow your frontend port (usually 5173)
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"], 
+    origin: [
+        "http://localhost:5173", 
+        "http://localhost:3000", 
+        "https://smart-contract-honeypot-detector.vercel.app"
+    ], 
     methods: ["GET", "POST"],
     credentials: true
 }));
